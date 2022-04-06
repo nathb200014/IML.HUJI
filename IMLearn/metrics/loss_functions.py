@@ -13,8 +13,8 @@ def mean_square_error(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     -------
     MSE of given predictions
     """
-    mat = np.subtract(y_true - y_pred)
-    return mat.T * mat
+    mat = y_true - y_pred
+    return np.square(mat).mean()
 
 
 

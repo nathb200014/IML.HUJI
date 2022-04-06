@@ -1,5 +1,6 @@
 import os
 
+from IMLearn.metrics import mean_square_error
 from IMLearn.utils import split_train_test
 from IMLearn.learners.regressors import LinearRegression
 
@@ -29,9 +30,11 @@ def load_data(filename: str):
     df = df.drop('id', axis=1)
     df = df.drop('date', axis=1)
     #remove errors from remaining columns
-    col_names = ["price", "bedrooms", "bathrooms", "sqft_living", "sqft_lot"]
+    col_names = ["price", "bedrooms", "bathrooms", "sqft_living", "sqft_lot","sqft_above","sqft_basement"
+        ,"sqft_living15","sqft_lot15", "zipcode"]
     for s in col_names:
         df = df[df[s] > 0]
+        df[s] = df[s].astype(int)
     #categorical with no logical order
     pd.get_dummies(df.zipcode)
     #new category based on existing ones
@@ -63,18 +66,9 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
         sd_x = X[i].std()
         denominator = 1 / (sd_x * sd_y)
         corr = cov[i]['price'] * denominator
-        # py.title("Pearson correlation under specific model")
-        # py.xlabel("feature")
-        # py.ylabel("response")
-        # py.scatter(X[i], y)
-        # py.show()
-        graph = go.Figure([go.Scatter(x=X[i], y=y, mode='markers')],
-                          layout=go.Layout(title=r"$\text{Correlation between " + str(i) +
-                                                 " and price ---" + "pearson correlation: " + str(corr) + " ""}$",
-                                           xaxis_title=r"$\text{" + str(i) + "}$",
-                                           yaxis_title=r"$\text{price}$"))
-        if not os.path.exists(output_path):
-            os.mkdir(output_path)
+        scat = go.Scatter(x=X[i], y=y, mode='markers')
+        graph = go.Figure([scat], layout=go.Layout(title="Person correlation between " + str(i) + " and the price "
+                                                         + str(corr),xaxis_title= str(i), yaxis_title="price"))
         graph.write_image(output_path + "/" + str(i) + ".png")
 
 
@@ -82,8 +76,7 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
 if __name__ == '__main__':
     np.random.seed(0)
     # Question 1 - Load and preprocessing of housing prices dataset
-    X, y = load_data("/cs/usr/nathb200014/PycharmProjects/IML.HUJI/datasets/house_prices.csv")
-
+    X, y = load_data("/cs/usr/nathb200014/IML.HUJI/datasets/house_prices.csv")
     # Question 2 - Feature evaluation with respect to response
     feature_evaluation(X, y, "bohbot") #todo ajouter path
     # Question 3 - Split samples into training- and testing sets.
@@ -97,17 +90,27 @@ if __name__ == '__main__':
     #   4) Store average and variance of loss over test set
     # Then plot average loss as function of training size with error ribbon of size (mean-2*std, mean+2*std)
 
-    loss_mean = sd_arr = np.zeros(101)
+    loss_mean = []
+    sd_arr = []
+    sd_arr1 = []
+    index = []
     loss = None
     for p in range(10, 101):
+        loss = []
         for time in range(10):
-            loss = np.zeros(10)
             sampled_x = train_X.sample(frac=p/100)
-            sampled_y = train_y[train_X.index] #todo cest comme ca ?
+            sampled_y = train_y[sampled_x.index]
             model = LinearRegression()
-            model._fit(sampled_x.values, sampled_y.values)
-            loss_num = model._loss(test_X.values, test_y.values)
-            np.append(loss, loss_num)
-        np.append(loss_mean, np.mean(loss))
-        np.append(sd_arr, np.std(loss))
-    # #todo ajoute instructions graph
+            model._fit(sampled_x, sampled_y)
+            loss_num = mean_square_error(test_y, model._predict(test_X))
+            loss.append(loss_num)
+        index.append(p / 100)
+        loss_mean.append(np.mean(loss))
+        sd_arr.append(np.mean(loss) + 2*np.std(loss))
+        sd_arr1.append(np.mean(loss) - 2 * np.std(loss))
+    graph1 = go.Scatter(x=index, y=loss_mean, name="Mean Loss")
+    graph2 = go.Scatter(x=index, y=sd_arr, line=dict(color="lightgray"))
+    graph3 = go.Scatter(x=index, y=sd_arr1, line=dict(color="lightgray"))
+    graph = go.Figure(graph1)
+    graph.add_traces([graph2, graph3])
+    graph.show()
