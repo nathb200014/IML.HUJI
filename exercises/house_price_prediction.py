@@ -30,13 +30,12 @@ def load_data(filename: str):
     df = df.drop('id', axis=1)
     df = df.drop('date', axis=1)
     #remove errors from remaining columns
-    col_names = ["price", "bedrooms", "bathrooms", "sqft_living", "sqft_lot","sqft_above","sqft_basement"
-        ,"sqft_living15","sqft_lot15", "zipcode"]
+    col_names = ["price", "bedrooms", "bathrooms", "sqft_living", "sqft_lot"]
     for s in col_names:
         df = df[df[s] > 0]
         df[s] = df[s].astype(int)
     #categorical with no logical order
-    pd.get_dummies(df.zipcode)
+    df = pd.get_dummies(df, prefix="zipcode", columns=["zipcode"])
     #new category based on existing ones
     df['sqft_overall'] = df.apply(lambda row: row.price / (row.sqft_living + (1/3)*row.sqft_basement),
                                   axis=1)
@@ -59,6 +58,9 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
     output_path: str (default ".")
         Path to folder in which plots are saved
     """
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)
+
     X = X.assign(price = y)
     cov = X.cov()
     sd_y = X['price'].std()
@@ -76,7 +78,7 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
 if __name__ == '__main__':
     np.random.seed(0)
     # Question 1 - Load and preprocessing of housing prices dataset
-    X, y = load_data("/cs/usr/nathb200014/IML.HUJI/datasets/house_prices.csv")
+    X, y = load_data("/Users/andybenichou/Desktop/nb/IML.HUJI/datasets/house_prices.csv")
     # Question 2 - Feature evaluation with respect to response
     feature_evaluation(X, y, "bohbot") #todo ajouter path
     # Question 3 - Split samples into training- and testing sets.
