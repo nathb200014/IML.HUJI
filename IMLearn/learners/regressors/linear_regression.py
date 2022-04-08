@@ -48,7 +48,7 @@ class LinearRegression(BaseEstimator):
             b = np.ones((X.shape[0], 1))
             X = np.hstack((b, X))
 
-        mat = Mat = np.linalg.pinv(X.T)
+        mat = np.linalg.pinv(X.T)
         self.coefs_ = mat.T @ y
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
