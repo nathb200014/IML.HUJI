@@ -39,7 +39,7 @@ def load_data(filename: str) -> pd.DataFrame:
 if __name__ == '__main__':
     np.random.seed(0)
     # Question 1 - Load and preprocessing of city temperature dataset
-    X = load_data("/Users/andybenichou/Desktop/nb/IML.HUJI/datasets/City_Temperature.csv")
+    X = load_data("/Users/nathb200014/Desktop/nb/IML.HUJI/datasets/City_Temperature.csv")
     # Question 2 - Exploring data for specific country
     df_cond = X.loc[X['Country'] == "Israel"]
     graph = px.scatter(df_cond, x='DayOfYear', y='Temp', color='Year',
