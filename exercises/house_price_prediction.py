@@ -78,7 +78,7 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
 if __name__ == '__main__':
     np.random.seed(0)
     # Question 1 - Load and preprocessing of housing prices dataset
-    X, y = load_data("/Users/andybenichou/Desktop/nb/IML.HUJI/datasets/house_prices.csv")
+    X, y = load_data("/Users/nathb200014/Desktop/nb/IML.HUJI/datasets/house_prices.csv")
     # Question 2 - Feature evaluation with respect to response
     feature_evaluation(X, y, "bohbot") #todo ajouter path
     # Question 3 - Split samples into training- and testing sets.
