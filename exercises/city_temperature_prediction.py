@@ -82,7 +82,7 @@ if __name__ == '__main__':
     graph3.show()
 
     #Question 5 - Evaluating fitted model on different countries
-    model = PolynomialFitting(5)  # todo checker qui est le bon k
+    model = PolynomialFitting(5) 
     model._fit(df_cond['DayOfYear'], df_cond["Temp"])
     countries = ['South Africa','The Netherlands', 'Jordan']
     Mse = []
