@@ -46,7 +46,28 @@ class LDA(BaseEstimator):
         y : ndarray of shape (n_samples, )
             Responses of input data to fit to
         """
-        raise NotImplementedError()
+        self.classes_ = np.unique(y) #todo changer
+        self.mu_ = np.zeros(self.classes_.size)
+        i = sum = 0
+        for k in self.classes_:
+            self.mu_[i] = np.mean(X[np.where(y == k)], axis=0)
+            i += 1
+        for j in range(self.classes_.size):
+            first_part = X[np.where(y == self.classes_[j])] - self.mu_[j]
+            sum += np.matmul(first_part, first_part.T)
+         #m todo checker ce que cest que m
+         #nk todo checker ce que cest nk
+        #pi todo
+
+
+        #todo self.cov_ = 1/
+
+
+
+
+
+
+
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """

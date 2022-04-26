@@ -2,6 +2,7 @@ from IMLearn.learners.classifiers import Perceptron, LDA, GaussianNaiveBayes
 import numpy as np
 from typing import Tuple
 import plotly.graph_objects as go
+import plotly.express as px
 import plotly.io as pio
 from plotly.subplots import make_subplots
 pio.templates.default = "simple_white"
@@ -26,8 +27,7 @@ def load_dataset(filename: str) -> Tuple[np.ndarray, np.ndarray]:
         Class vector specifying for each sample its class
 
     """
-    raise NotImplementedError()
-
+    return np.load(filename)[:, :2], np.load(filename)[:, 2]
 
 def run_perceptron():
     """
@@ -38,14 +38,21 @@ def run_perceptron():
     """
     for n, f in [("Linearly Separable", "linearly_separable.npy"), ("Linearly Inseparable", "linearly_inseparable.npy")]:
         # Load dataset
-        raise NotImplementedError()
+        X, y = load_dataset("/cs/usr/nathb200014/IML.HUJI/datasets/" + f)
 
         # Fit Perceptron and record loss in each fit iteration
         losses = []
-        raise NotImplementedError()
+        def callback(perceptron : Perceptron, arr : np.ndarray, num : int):
+            losses.append(perceptron._loss(X, y))
 
+        print(losses  )
         # Plot figure
-        raise NotImplementedError()
+        a = Perceptron(callback=callback)
+        a._fit(X, y)
+        line = px.line(x=range(len(losses)), y=losses,
+                       title="Evolution of the losses during the iterations",
+                       labels={"x": "Iterations", "y": "Losses"})
+        line.show()
 
 
 def compare_gaussian_classifiers():
@@ -68,4 +75,4 @@ def compare_gaussian_classifiers():
 if __name__ == '__main__':
     np.random.seed(0)
     run_perceptron()
-    compare_gaussian_classifiers()
+    #compare_gaussian_classifiers()
