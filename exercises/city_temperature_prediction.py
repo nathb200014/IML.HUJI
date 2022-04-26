@@ -39,7 +39,7 @@ def load_data(filename: str) -> pd.DataFrame:
 if __name__ == '__main__':
     np.random.seed(0)
     # Question 1 - Load and preprocessing of city temperature dataset
-    X = load_data("/cs/usr/nathb200014/IML.HUJI/datasets/City_Temperature.csv")
+    X = load_data("/Users/nathb200014/Desktop/nb/IML.HUJI/datasets/City_Temperature.csv")
     # Question 2 - Exploring data for specific country
     df_cond = X.loc[X['Country'] == "Israel"]
     graph = px.scatter(df_cond, x='DayOfYear', y='Temp', color='Year',
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     graph3.show()
 
     #Question 5 - Evaluating fitted model on different countries
-    model = PolynomialFitting(5)  # todo checker qui est le bon k
+    model = PolynomialFitting(5) 
     model._fit(df_cond['DayOfYear'], df_cond["Temp"])
     countries = ['South Africa','The Netherlands', 'Jordan']
     Mse = []
