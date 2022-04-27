@@ -1,3 +1,4 @@
+import math
 from typing import NoReturn
 from ...base import BaseEstimator
 import numpy as np
@@ -48,26 +49,17 @@ class LDA(BaseEstimator):
         """
         self.classes_ = np.unique(y) #todo changer
         self.mu_ = np.zeros(self.classes_.size)
+        self.pi_ = np.zeros(self.classes_.size)
         i = sum = 0
         for k in self.classes_:
             self.mu_[i] = np.mean(X[np.where(y == k)], axis=0)
+            self.pi_[i] = (1/X.shape[0])*np.where(y == k).size
             i += 1
         for j in range(self.classes_.size):
             first_part = X[np.where(y == self.classes_[j])] - self.mu_[j]
             sum += np.matmul(first_part, first_part.T)
-         #m todo checker ce que cest que m
-         #nk todo checker ce que cest nk
-        #pi todo
-
-
-        #todo self.cov_ = 1/
-
-
-
-
-
-
-
+        self.cov_ = (1/X.shape[0] - self.classes_.size)*sum
+        self._cov_inv = np.linalg.inv(self.cov_)
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -83,7 +75,16 @@ class LDA(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+        y = np.zeros(self.classes_.size)
+        i = 0
+        for _ in range(X.shape[0]):
+            a = np.zeros(self.classes_.size)
+            b = np.zeros(self.classes_.size)
+            for k in range(self.classes_.size):
+                a[k] = np.matmul(self._cov_inv, self.pi_[k])
+                b[k] = math.log(self.pi_[k]) - (1/2)*np.matmul(np.matmul(self.mu_[k], self._cov_inv), self.mu_[k])
+
+            y[i] =
 
     def likelihood(self, X: np.ndarray) -> np.ndarray:
         """
