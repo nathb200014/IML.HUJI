@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
-pio.templates.default = "simple_whie"
+pio.templates.default = "simple_white"
 
 
 def load_data(filename: str) -> pd.DataFrame:
