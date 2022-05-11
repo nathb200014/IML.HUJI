@@ -55,23 +55,14 @@ class AdaBoost(BaseEstimator):
         self.models_ = []
         self.weights_ = []
         self.D_ = np.ones(X.shape[0]) / X.shape[0]
-        D = np.zeros(X.shape[0])
         for t in range(self.iterations_):
             h = self.wl_()
             h._fit(X, y*self.D_)
             self.models_.append(h)
-            epsilon = denominator = 0
-            for i in range(X.shape[0]):
-                bool = (y[i] != h._predict(X[i]))
-                epsilon += self.D_[i]*bool
+            epsilon = np.sum((y != h._predict(X)) * self.D_)
             w = (1/2)*np.log((1/epsilon)-1)
             self.weights_.append(w)
-            for i in range(X.shape[0]):
-                numerator = self.D_[i]*np.exp(-w*y[i]*h._predict(X[i]))
-                for j in range(X.shape[0]):
-                    denominator += self.D_[j]*np.exp(-w*y[j]*h._predict(X[j]))
-                D[i] = numerator/denominator
-            self.D_ = D
+            self.D_ *= np.exp(-w*y*h._predict(X))/np.sum(self.D_)
 
     def _predict(self, X):
         """
@@ -88,10 +79,10 @@ class AdaBoost(BaseEstimator):
             Predicted responses of given samples
         """
 
-        sum = 0
+        sum = np.zeros(X.shape[0])
         for i in range(self.iterations_):
             sum += self.weights_[i]*self.models_[i]._predict(X)
-        return np.sign(sum) #todo pas scalaire mais vecteur
+        return np.sign(sum)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """

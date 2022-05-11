@@ -41,7 +41,14 @@ class DecisionStump(BaseEstimator):
         y : ndarray of shape (n_samples, )
             Responses of input data to fit to
         """
-        raise NotImplementedError()
+        best_loss = np.inf
+        for sign, i in product([1, -1], range(X.shape[1])):
+            curr_th, curr_loss = self._find_threshold(X[:, i], y, sign)
+            if curr_loss < best_loss:
+                self.threshold_ = curr_th
+                self.j_ = i
+                self.sign_ = sign
+                best_loss = curr_loss
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -65,7 +72,7 @@ class DecisionStump(BaseEstimator):
         Feature values strictly below threshold are predicted as `-sign` whereas values which equal
         to or above the threshold are predicted as `sign`
         """
-        raise NotImplementedError()
+        return np.where(X[:, self.j_] >= self.threshold_, self.sign_, -self.sign_)
 
     def _find_threshold(self, values: np.ndarray, labels: np.ndarray, sign: int) -> Tuple[float, float]:
         """
@@ -97,7 +104,28 @@ class DecisionStump(BaseEstimator):
         For every tested threshold, values strictly below threshold are predicted as `-sign` whereas values
         which equal to or above the threshold are predicted as `sign`
         """
-        raise NotImplementedError()
+        # i = np.argsort(values)
+        # values , labels = values[i], labels[i]
+        # losses = []
+        # # for label in labels:
+        # #     if sign != label:
+        # #         losses.append(losses[-1] - 1/ len(labels))
+        # #     else:
+        # #         losses.append(losses[-1] + 1/ len(labels))
+        # for i in range(len(labels)):
+        #     new_labels = np.array([-sign if j < i
+        #                            else sign
+        #                            for j in range(len(labels))])
+        #     losses.append(np.sum(labels != new_labels) / len(labels))
+        # losses = np.array(losses)
+        # return values[np.argmin(losses)], losses[np.argmin(losses)]
+        sort_idx = np.argsort(values)
+        values, labels = values[sort_idx], labels[sort_idx]
+        sign_y = np.where(labels == 0, 1, labels)
+        min_err = np.abs(labels[np.sign(sign_y) != sign]).sum()  # smallest possible loss
+        errors = np.cumsum(np.append(min_err, sign * labels[:-1]))
+        best_index = np.argmin(errors)
+        return values[best_index], errors[best_index]
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """

@@ -42,20 +42,33 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     (train_X, train_y), (test_X, test_y) = generate_data(train_size, noise), generate_data(test_size, noise)
 
     # Question 1: Train- and test errors of AdaBoost in noiseless case
-    raise NotImplementedError()
+    adaBoost = AdaBoost(DecisionStump, n_learners)
+    adaBoost.fit(train_X, train_y)
+    training_error = []
+    test_error = []
+    for max_t in range(1,n_learners):
+        test_error.append(adaBoost.partial_loss(test_X, test_y, max_t))
+        training_error.append(adaBoost.partial_loss(train_X, train_y, max_t))
+    fig = go.Figure([
+        go.Scatter(x=list(range(1, n_learners)), y=training_error, name='train error'),
+        go.Scatter(x=list(range(1, n_learners)), y=test_error, name='test error')])
+    fig.update_layout(title="Training and test errors as a function of the number of fitted learners",
+                      xaxis=dict(title="Training and test errors"), yaxis=dict(title="number of fitted learners"))
+    fig.show()
 
     # Question 2: Plotting decision surfaces
     T = [5, 50, 100, 250]
     lims = np.array([np.r_[train_X, test_X].min(axis=0), np.r_[train_X, test_X].max(axis=0)]).T + np.array([-.1, .1])
-    raise NotImplementedError()
-
-    # Question 3: Decision surface of best performing ensemble
-    raise NotImplementedError()
-
-    # Question 4: Decision surface with weighted samples
-    raise NotImplementedError()
+    # raise NotImplementedError()
+    #
+    # # Question 3: Decision surface of best performing ensemble
+    # raise NotImplementedError()
+    #
+    # # Question 4: Decision surface with weighted samples
+    # raise NotImplementedError()
 
 
 if __name__ == '__main__':
     np.random.seed(0)
-    raise NotImplementedError()
+    fit_and_evaluate_adaboost(noise=0)
+    fit_and_evaluate_adaboost(noise=0.4)
