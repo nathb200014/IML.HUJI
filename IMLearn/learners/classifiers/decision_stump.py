@@ -89,7 +89,7 @@ class DecisionStump(BaseEstimator):
             The labels to compare against
 
         sign: int
-            Predicted label assigned to values equal to or above threshold
+            Predicted j assigned to values equal to or above threshold
 
         Returns
         -------
@@ -104,28 +104,23 @@ class DecisionStump(BaseEstimator):
         For every tested threshold, values strictly below threshold are predicted as `-sign` whereas values
         which equal to or above the threshold are predicted as `sign`
         """
-        # i = np.argsort(values)
-        # values , labels = values[i], labels[i]
-        # losses = []
-        # # for label in labels:
-        # #     if sign != label:
-        # #         losses.append(losses[-1] - 1/ len(labels))
-        # #     else:
-        # #         losses.append(losses[-1] + 1/ len(labels))
-        # for i in range(len(labels)):
-        #     new_labels = np.array([-sign if j < i
-        #                            else sign
-        #                            for j in range(len(labels))])
-        #     losses.append(np.sum(labels != new_labels) / len(labels))
-        # losses = np.array(losses)
-        # return values[np.argmin(losses)], losses[np.argmin(losses)]
-        sort_idx = np.argsort(values)
-        values, labels = values[sort_idx], labels[sort_idx]
-        sign_y = np.where(labels == 0, 1, labels)
-        min_err = np.abs(labels[np.sign(sign_y) != sign]).sum()  # smallest possible loss
-        errors = np.cumsum(np.append(min_err, sign * labels[:-1]))
-        best_index = np.argmin(errors)
-        return values[best_index], errors[best_index]
+        i = np.argsort(values)
+        values, labels = values[i], labels[i]
+        signs = []
+        for i in range(labels.size):
+            if labels[i] < 0:
+                signs.append(-1)
+            else:
+                signs.append(1)
+        errors = [np.abs(labels[np.sign(np.array(signs)) != sign]).sum()]
+        for i, j in enumerate(labels[:-1]):
+            minus = errors[-1] - j
+            plus = errors[-1] + j
+            if (j >= 0 and signs[i] == sign) or (j < 0 and signs[i] != sign):
+                errors.append(plus)
+            elif (j < 0 and signs[i] == sign) or (j >= 0 and signs[i] != sign):
+                errors.append(minus)
+        return values[np.argmin(errors)], errors[np.argmin(errors)]
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """

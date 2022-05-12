@@ -59,7 +59,7 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     # Question 2: Plotting decision surfaces
     T = [5, 50, 100, 250]
     lims = np.array([np.r_[train_X, test_X].min(axis=0), np.r_[train_X, test_X].max(axis=0)]).T + np.array([-.1, .1])
-    fig = make_subplots(2, 2, subplot_titles=[f"AdaBoost Ensemble trained up to {t} iterations" for t in T])
+    fig = make_subplots(2, 2, subplot_titles=[f"{t} classifiers" for t in T])
     for i, T in enumerate(T):
         fig.add_traces([decision_surface(lambda x: adaBoost.partial_predict(x, T), lims[0], lims[1], showscale=False),
                         go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers", showlegend=False,
@@ -67,7 +67,7 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
                                                colorscale=[custom[0], custom[-1]],
                                                line=dict(color="black", width=1)))],
                        rows=(i // 2) + 1, cols=(i % 2) + 1)
-    fig.update_layout(title=rf"$\textbf{{Decision boundary obtained by using the ensemble at different iterations}}$",
+    fig.update_layout(title=rf"$\textbf{{Decision boundary received by using the ensemble at different iterations}}$",
                       margin=dict(t=100)).update_xaxes(visible=False).update_yaxes(visible=False)
     fig.show()
     # Question 3: Decision surface of best performing ensemble
@@ -76,7 +76,7 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
                     go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers", showlegend=False,
                                marker=dict(color=test_y,colorscale=[custom[0], custom[-1]],
                                            line=dict(color="black", width=1)))])
-    fig.update_layout(title=f"Best decision boundaries with noise = {noise} with ensemble size ="
+    fig.update_layout(title=f"Best decision boundary with noise = {noise}, ensemble size ="
                             f" {np.argmin(test_error) + 1} and accuracy = "
                             f"{accuracy(adaBoost.partial_predict(test_X, T), test_y)}")
     fig.show()
