@@ -148,5 +148,4 @@ class AdaBoost(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-
         return misclassification_error(y, self.partial_predict(X, T))

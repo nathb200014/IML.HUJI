@@ -85,7 +85,7 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     fig.add_traces([decision_surface(lambda X: adaBoost.predict(X), lims[0], lims[1], showscale=False),
                     go.Scatter(x=train_X[:, 0], y=train_X[:, 1], mode="markers", showlegend=False,
                                marker=dict(color=train_y, colorscale=[custom[0], custom[-1]],
-                                           size=(adaBoost.D_ / np.max(adaBoost.D_))*5,
+                                           size=(adaBoost.D_ / np.max(adaBoost.D_))*50,
                                            line=dict(color="black", width=1)))])
     fig.update_layout(title=f"Weighted train decision boundaries with noise = {noise}")
     fig.show()
